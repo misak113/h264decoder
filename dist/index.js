@@ -1,8 +1,9 @@
 import { h264ModulePromise } from './h264.wasm.js';
 let h264Module;
-h264ModulePromise
+const readyPromise = h264ModulePromise
     .then((mod) => {
     h264Module = mod;
+    H264Decoder.isReady = true;
 })
     .catch((error) => {
     console.error(error);
@@ -94,9 +95,14 @@ export class H264Decoder {
         return retCode;
     }
 }
+H264Decoder.isReady = false;
+H264Decoder.readyPromise = readyPromise;
 H264Decoder.RDY = 0;
 H264Decoder.PIC_RDY = 1;
 H264Decoder.HDRS_RDY = 2;
 H264Decoder.ERROR = 3;
 H264Decoder.PARAM_SET_ERROR = 4;
 H264Decoder.MEMALLOC_ERROR = 5;
+if (typeof window !== undefined) {
+    window.H264Decoder = H264Decoder;
+}

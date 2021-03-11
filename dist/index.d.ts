@@ -14,6 +14,8 @@ export declare class H264Decoder {
     width: number;
     height: number;
     pic: Uint8Array;
+    static isReady: boolean;
+    static readyPromise: Promise<void>;
     static RDY: number;
     static PIC_RDY: number;
     static HDRS_RDY: number;
@@ -22,4 +24,9 @@ export declare class H264Decoder {
     static MEMALLOC_ERROR: number;
     constructor();
     decode(nalu: Uint8Array): number;
+}
+declare global {
+    interface Window {
+        H264Decoder: typeof H264Decoder;
+    }
 }

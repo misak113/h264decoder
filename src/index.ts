@@ -17,9 +17,10 @@ type H264Exports = {
 
 import { h264ModulePromise } from './h264.wasm.js';
 let h264Module: WebAssembly.Module;
-h264ModulePromise
+const readyPromise = h264ModulePromise
 .then((mod) => {
   h264Module = mod;
+  H264Decoder.isReady = true;
 })
 .catch((error) => {
   console.error(error);
@@ -84,6 +85,9 @@ export class H264Decoder {
   public height = 0;
   public pic = new Uint8Array(0);
 
+  public static isReady: boolean = false;
+  public static readyPromise: Promise<void> = readyPromise;
+
   static RDY = 0;
   static PIC_RDY = 1;
   static HDRS_RDY = 2;
@@ -145,4 +149,14 @@ export class H264Decoder {
 
     return retCode;
   }
+}
+
+declare global {
+  interface Window {
+    H264Decoder: typeof H264Decoder;
+  }
+}
+
+if (typeof window !== undefined) {
+  window.H264Decoder = H264Decoder;
 }
