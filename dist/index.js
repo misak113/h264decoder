@@ -1,8 +1,26 @@
 import { h264ModulePromise } from './h264.wasm.js';
-let h264Module;
+let h264Instance;
+let memory;
 const readyPromise = h264ModulePromise
-    .then((mod) => {
-    h264Module = mod;
+    .then(async (h264Module) => {
+    const wasmMemory = new WebAssembly.Memory({
+        "initial": INITIAL_INITIAL_MEMORY / WASM_PAGE_SIZE,
+        "maximum": 2147483648 / WASM_PAGE_SIZE
+    });
+    memory = {
+        memory: wasmMemory,
+        HEAP8: new Int8Array(wasmMemory.buffer),
+        HEAPU8: new Uint8Array(wasmMemory.buffer),
+        HEAP32: new Int32Array(wasmMemory.buffer),
+    };
+    const instance = await WebAssembly.instantiate(h264Module, {
+        h264: {
+            memory: wasmMemory,
+            memcpy: memcpy(memory),
+            resize: resize(memory),
+        }
+    });
+    h264Instance = instance;
     H264Decoder.isReady = true;
 })
     .catch((error) => {
@@ -54,24 +72,8 @@ export class H264Decoder {
         this.width = 0;
         this.height = 0;
         this.pic = new Uint8Array(0);
-        const wasmMemory = new WebAssembly.Memory({
-            "initial": INITIAL_INITIAL_MEMORY / WASM_PAGE_SIZE,
-            "maximum": 2147483648 / WASM_PAGE_SIZE
-        });
-        const memory = {
-            memory: wasmMemory,
-            HEAP8: new Int8Array(wasmMemory.buffer),
-            HEAPU8: new Uint8Array(wasmMemory.buffer),
-            HEAP32: new Int32Array(wasmMemory.buffer),
-        };
         memory.HEAP32[DYNAMICTOP_PTR >> 2] = DYNAMIC_BASE;
-        const { exports: asm } = new WebAssembly.Instance(h264Module, {
-            h264: {
-                memory: wasmMemory,
-                memcpy: memcpy(memory),
-                resize: resize(memory),
-            }
-        });
+        const { exports: asm } = h264Instance;
         this.memory = memory;
         this.asm = asm;
         this.pStorage = asm.h264alloc();
