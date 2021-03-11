@@ -2,4 +2,4 @@ const text = "AGFzbQEAAAABlwETYAJ/fwF/YAR/f39/AX9gAn9/AGADf39/AX9gAX8AYAl/f39/f3
 
 import { decode } from './b64.js';
 
-export const h264Module = new WebAssembly.Module(decode(text));
+export const h264ModulePromise = WebAssembly.compile(decode(text));

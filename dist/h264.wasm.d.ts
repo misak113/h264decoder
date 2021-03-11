@@ -1,1 +1,1 @@
-export declare const h264Module: WebAssembly.Module;
+export declare const h264ModulePromise: Promise<WebAssembly.Module>;

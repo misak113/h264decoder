@@ -1,4 +1,12 @@
-import { h264Module } from './h264.wasm.js';
+import { h264ModulePromise } from './h264.wasm.js';
+let h264Module;
+h264ModulePromise
+    .then((mod) => {
+    h264Module = mod;
+})
+    .catch((error) => {
+    console.error(error);
+});
 const memcpy = (Module) => (dest, src, num) => {
     Module.HEAPU8.copyWithin(dest, src, src + num);
 };
