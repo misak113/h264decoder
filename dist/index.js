@@ -1,6 +1,4 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-const h264_wasm_1 = require("./h264.wasm");
+import { h264Module } from './h264.wasm.js';
 const memcpy = (Module) => (dest, src, num) => {
     Module.HEAPU8.copyWithin(dest, src, src + num);
 };
@@ -42,7 +40,7 @@ const INITIAL_INITIAL_MEMORY = 16777216;
  * Each call to decode(nalu) will decode a single encoded element.
  * When decode(nalu) returns PIC_RDY, a picture is ready in the output buffer.
  */
-class H264Decoder {
+export class H264Decoder {
     constructor() {
         this.width = 0;
         this.height = 0;
@@ -58,7 +56,7 @@ class H264Decoder {
             HEAP32: new Int32Array(wasmMemory.buffer),
         };
         memory.HEAP32[DYNAMICTOP_PTR >> 2] = DYNAMIC_BASE;
-        const { exports: asm } = new WebAssembly.Instance(h264_wasm_1.h264Module, {
+        const { exports: asm } = new WebAssembly.Instance(h264Module, {
             h264: {
                 memory: wasmMemory,
                 memcpy: memcpy(memory),
@@ -88,7 +86,6 @@ class H264Decoder {
         return retCode;
     }
 }
-exports.H264Decoder = H264Decoder;
 H264Decoder.RDY = 0;
 H264Decoder.PIC_RDY = 1;
 H264Decoder.HDRS_RDY = 2;

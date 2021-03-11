@@ -15,7 +15,7 @@ type H264Exports = {
   h264alloc(): number;
 };
 
-import { h264Module } from './h264.wasm';
+import { h264Module } from './h264.wasm.js';
 
 const memcpy = (Module: ModuleMemory) =>
   (dest: number, src: number, num: number) => {

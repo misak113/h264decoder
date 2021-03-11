@@ -1,7 +1,5 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 const key = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
-function decode(input) {
+export function decode(input) {
     let len = input.length;
     if (input[input.length - 2] === '=')
         len -= 2;
@@ -24,4 +22,3 @@ function decode(input) {
     }
     return uarray;
 }
-exports.decode = decode;
